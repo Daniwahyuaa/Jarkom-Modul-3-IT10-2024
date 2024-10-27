@@ -135,9 +135,10 @@ apt install isc-dhcp-relay -y
 ```
 #### Tybur (DHCP)
 ```bash
-echo 'nameserver 192.238.4.2' > /etc/resolv.conf
 apt-get update
 apt-get install isc-dhcp-server -y
+echo 'nameserver 192.238.4.2' >> /etc/resolv.conf
+echo 'INTERFACESv4="eth0"' > /etc/default/isc-dhcp-server
 ```
 #### Fritz (DNS)
 ```bash
@@ -349,10 +350,23 @@ subnet 192.238.4.0 netmask 255.255.255.0 {
 # Restart DHCP service
 service isc-dhcp-server restart
 ```
+untuk di tybur
+```bash
+    range 192.238.1.05 192.238.1.25;
+    range 192.238.1.50 192.238.1.100;
+    option routers 192.238.1.1;
+```
 Sama seperti no. 1, kita jalankan di fritz
 ## Soal 3
 Client yang melalui bangsa eldia mendapatkan range IP dari [prefix IP].2.09 - [prefix IP].2.27 dan [prefix IP].2 .81 - [prefix IP].2.243 (3)
 Sama seperti diatas, jalankan code berikut:
+untuk di tybur
+```bash
+    range 192.238.2.09 192.238.2.27;
+    range 192.238.2.81 192.238.2.243;
+    option routers 192.238.2.1;
+```
+untuk di Fritz
 ```bash
 echo 'subnet 192.238.1.0 netmask 255.255.255.0 {
     range 192.238.1.05 192.238.1.25;
