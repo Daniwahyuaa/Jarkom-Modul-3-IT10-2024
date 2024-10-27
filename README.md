@@ -307,7 +307,7 @@ untuk di tybur
     range 192.238.1.50 192.238.1.100;
     option routers 192.238.1.1;
 ```
-Sama seperti no. 1, kita jalankan di fritz
+Kita jalankan di fritz
 ## Soal 3
 Client yang melalui bangsa eldia mendapatkan range IP dari [prefix IP].2.09 - [prefix IP].2.27 dan [prefix IP].2 .81 - [prefix IP].2.243 (3)
 Sama seperti diatas, jalankan code berikut:
