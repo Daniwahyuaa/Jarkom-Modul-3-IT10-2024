@@ -2,7 +2,7 @@
 Kelompok IT 10
 | No | Nama                 | NRP         |
 |----|----------------------|---------------------------|
-| 1  | dani Wahyu            | 5027231038                    |
+| 1  | Dani Wahyu            | 5027231038                    |
 | 2  | Abid Ubaidillah       | 5027231089                  | 
 ---
 ## Topology
@@ -275,62 +275,13 @@ apt install htop -y
 apt install apache2-utils -y
 apt-get install jq -y
 ```
-## Soal 1
-Pulau Paradis dan Marley, sama-sama menghadapi ancaman besar dari satu sama lain. Keduanya membangun infrastruktur pertahanan yang kuat untuk melindungi sistem vital mereka. Dengan strategi yang matang, mereka bersiap menghadapi serangan dan mempertahankan wilayah masing-masing.
-Bangsa Marley, dipimpin oleh Zeke, telah mempersiapkan Annie, Bertholdt, dan Reiner untuk menyerang menggunakan Laravel Worker. Di sisi lain, Klan Eldia dari Paradis telah mempersiapkan Armin, Eren, dan Mikasa sebagai PHP Worker untuk mempertahankan pulau tersebut. Warhammer bertindak sebagai Database Server, sementara Beast dan Colossal sebagai Load Balancer. 
----------------------
 
-Pulau Paradis telah menjadi tempat yang damai selama 1000 tahun, namun kedamaian tersebut tidak bertahan selamanya. Perang antara kaum Marley dan Eldia telah mencapai puncak. Kaum Marley yang dipimpin oleh Zeke, me-register domain name marley.yyy.com untuk worker Laravel mengarah pada Annie. Namun ternyata tidak hanya kaum Marley saja yang berinisiasi, kaum Eldia ternyata sudah mendaftarkan domain name eldia.yyy.com untuk worker PHP (0) mengarah pada Armin.
-
-(1)Lakukan konfigurasi sesuai dengan peta yang sudah diberikan.
-
-Oke, pertama saya membuat file soal1.sh di ``FRITZ``. Setelah itu saya memasukkan code berikut :
-```bash
-echo 'zone "marley.it10.com" { 
-type master; 
-file "/etc/bind/marley/marley.it10.com";
-};
-zone "eldia.it10.com" {
-type master;
-file "/etc/bind/eldia/eldia.it10.com";
-}; ' >> /etc/bind/named.conf.local
-mkdir /etc/bind/marley
-mkdir /etc/bind/eldia
-echo ';
-; BIND data file for local loopback interface
-;
-$TTL    604800
-@       IN      SOA     marley.it10.com. root.marley.it10.com. (
-                              2         ; Serial
-                         604800         ; Refresh
-                          86400         ; Retry
-                        2419200         ; Expire
-                         604800 )       ; Negative Cache TTL
-;
-@       IN      NS      marley.it10.com.
-@       IN      A       192.239.1.2     ; IP Annie' > /etc/bind/marley/marley.it10.com
-echo ';
-; BIND data file for local loopback interface
-;
-$TTL    604800
-@       IN      SOA     eldia.it10.com. root.eldia.it10.com. (
-                              2         ; Serial
-                         604800         ; Refresh
-                          86400         ; Retry
-                        2419200         ; Expire
-                         604800 )       ; Negative Cache TTL
-;
-@       IN      NS      eldia.16.com.
-@       IN      A       192.239.2.2     ; IP Armin' > /etc/bind/eldia/eldia.it10.com
-service bind9 restart
-```
-Setelah memasukkan code tersebut, kita lanjutkan dengan bash soal1.sh
 ## Soal2
 Jauh sebelum perang dimulai, ternyata para keluarga bangsawan, Tybur dan Fritz, telah membuat kesepakatan sebagai berikut:
 Semua Client harus menggunakan konfigurasi ip address dari keluarga Tybur (dhcp).
 Client yang melalui bangsa marley mendapatkan range IP dari [prefix IP].1.05 - [prefix IP].1.25 dan [prefix IP].1.50 - [prefix IP].1.100 (2)
 
-Sama seperti diatas, kita membuat soal2.sh. Setelah itu kita masukkan dan kita jalankan code berikut:
+Kita membuat soal2.sh. Setelah itu kita masukkan dan kita jalankan code berikut:
 ```bash
 echo 'subnet 192.238.1.0 netmask 255.255.255.0 {
     range 192.238.1.05 192.238.1.25;
