@@ -3,7 +3,7 @@ Kelompok IT 10
 | No | Nama                 | NRP         |
 |----|----------------------|---------------------------|
 | 1  | dani Wahyu            | 5027231038                    |
-| 2  | Abid Ubaidillah       | 5027231085                  | 
+| 2  | Abid Ubaidillah       | 5027231089                  | 
 ---
 ## Topology
 ![image](https://github.com/user-attachments/assets/459b0221-7aa3-493d-b356-5f58b66059b5)
