@@ -289,7 +289,7 @@ subnet 192.238.4.0 netmask 255.255.255.0 {
 
 service isc-dhcp-server restart
 ```
-Output dari hasil diatas 				:
+Ini adalah Output dari hasil diatas 				:
 ![Screenshot 2024-10-30 165157](https://github.com/user-attachments/assets/bae58683-fd23-4492-81e2-9f1bea027c7f)
 ![Screenshot 2024-10-30 165146](https://github.com/user-attachments/assets/4c6c5361-2450-45d4-91a0-a1bcaae1b2ce)
 ![Screenshot 2024-10-30 165138](https://github.com/user-attachments/assets/0e210ad5-fceb-4e1e-82bb-647356a874fb)
