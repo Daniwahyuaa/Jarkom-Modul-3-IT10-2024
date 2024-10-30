@@ -126,269 +126,158 @@ iface eth0 inet static
 	gateway 192.238.1.1
 ```
 ##### PREFIX PAKAI 192.238
-### Node
-#### Paradis
-```bash
-iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE -s 192.138.0.0/16
-apt-get update
-apt install isc-dhcp-relay -y
+### Setup Node
+
+## Soal 0
+Pulau Paradis telah menjadi tempat yang damai selama 1000 tahun, namun kedamaian tersebut tidak bertahan selamanya. Perang antara kaum Marley dan Eldia telah mencapai puncak. Kaum Marley yang dipimpin oleh Zeke, me-register domain name marley.yyy.com untuk worker Laravel mengarah pada Annie. Namun ternyata tidak hanya kaum Marley saja yang berinisiasi, kaum Eldia ternyata sudah mendaftarkan domain name eldia.yyy.com untuk worker PHP (0) mengarah pada Armin.
+
 ```
-#### Tybur (DHCP)
-```bash
-apt-get update
-apt-get install isc-dhcp-server -y
-echo 'nameserver 192.238.4.2' >> /etc/resolv.conf
-echo 'INTERFACESv4="eth0"' > /etc/default/isc-dhcp-server
-```
-#### Fritz (DNS)
-```bash
-echo 'nameserver 192.168.122.1' > /etc/resolv.conf
-apt-get update
-apt-get install bind9 -y
-echo 'options {
-directory "/var/cache/bind";
-forwarders {
-192.168.122.1;
+echo "zone \"marley.IT10.com\" {
+	type master;
+	file \"/etc/bind/jarkom/marley.IT10.com\";
 };
-// dnssec-validation auto;
-allow-query{any;};
-auth-nxdomain no;
-listen-on-v6 { any; };
-}; ' >/etc/bind/named.conf.options
+
+zone \"eldia.IT10.com\" {
+	type master;
+	file \"/etc/bind/jarkom/eldia.IT10.com\";
+};
+" > /etc/bind/named.conf.local
+
+mkdir /etc/bind/jarkom
+
+marley="
+;
+;BIND data file for local loopback interface
+;
+\$TTL    604800
+@    IN    SOA    marley.IT10.com. root.marley.IT10.com. (
+        2        ; Serial
+                604800        ; Refresh
+                86400        ; Retry
+                2419200        ; Expire
+                604800 )    ; Negative Cache TTL
+;                   
+@    IN    NS    marley.IT10.com.
+@       IN    A    192.238.1.2
+"
+echo "$marley" > /etc/bind/jarkom/marley.IT10.com
+
+eldia="
+;
+;BIND data file for local loopback interface
+;
+\$TTL    604800
+@    IN    SOA    eldia.IT10.com. root.eldia.IT10.com. (
+        2        ; Serial
+                604800        ; Refresh
+                86400        ; Retry
+                2419200        ; Expire
+                604800 )    ; Negative Cache TTL
+;                   
+@    IN    NS    eldia.IT10.com.
+@       IN    A    192.238.2.1
+"
+echo "$eldia" > /etc/bind/jarkom/eldia.IT10.com
+
 service bind9 restart
 ```
-#### Warhammer (Database)
-```bash
-echo 'nameserver 192.238.4.2' > /etc/resolv.conf
-apt-get update
-apt-get install mariadb-server -y
-service mysql start
-```
-#### Armin (PHP)
-```bash
-echo 'nameserver 192.238.4.2' > /etc/resolv.conf
-apt-get update
-apt-get install nginx -y
-apt-get install wget -y
-apt-get install unzip -y
-apt-get install lynx -y
-apt-get install htop -y
-apt-get install apache2-utils -y
-apt-get install php7.3-fpm php7.3-common php7.3-mysql php7.3-gmp php7.3-curl php7.3-intl php7.3-mbstring php7.3-xmlrpc php7.3-gd php7.3-xml php7.3-cli php7.3-zip -y
 
-service nginx start
-service php7.3-fpm start
-```
-#### Mikasa (PHP)
-```bash
-echo 'nameserver 192.238.4.2' > /etc/resolv.conf
-apt-get update
-apt-get install nginx -y
-apt-get install wget -y
-apt-get install unzip -y
-apt-get install lynx -y
-apt-get install htop -y
-apt-get install apache2-utils -y
-apt-get install php7.3-fpm php7.3-common php7.3-mysql php7.3-gmp php7.3-curl php7.3-intl php7.3-mbstring php7.3-xmlrpc php7.3-gd php7.3-xml php7.3-cli php7.3-zip -y
+## Soal 1
+Melakukan Konfigurasi sesuai dengan yang sudah diberikan.
 
-service nginx start
-service php7.3-fpm start
-```
-#### Eren (PHP)
-```bash
-echo 'nameserver 192.238.4.2' > /etc/resolv.conf
-apt-get update
-apt-get install nginx -y
-apt-get install wget -y
-apt-get install unzip -y
-apt-get install lynx -y
-apt-get install htop -y
-apt-get install apache2-utils -y
-apt-get install php7.3-fpm php7.3-common php7.3-mysql php7.3-gmp php7.3-curl php7.3-intl php7.3-mbstring php7.3-xmlrpc php7.3-gd php7.3-xml php7.3-cli php7.3-zip -y
-service nginx start
-service php7.3-fpm start
-```
-#### Annie (Laravel)
-```bash
-apt-get update
-apt-get install lynx -y
-apt-get install mariadb-client -y
-apt-get install -y lsb-release ca-certificates apt-transport-https software-properties-common gnupg2
-apt-get install curl -y
-curl -sSLo /usr/share/keyrings/deb.sury.org-php.gpg https://packages.sury.org/php/apt.gpg
-sh -c 'echo "deb [signed-by=/usr/share/keyrings/deb.sury.org-php.gpg] https://packages.sury.org/php/ $(lsb_release -sc) main" > /etc/apt/sources.list.d/php.list'
-apt-get update
-apt-get install php8.0-mbstring php8.0-xml php8.0-cli   php8.0-common php8.0-intl php8.0-opcache php8.0-readline php8.0-mysql php8.0-fpm php8.0-curl unzip wget -y
-apt-get install nginx -y
-apt-get install git -y
-apt-get install htop -y
-service nginx start
-service php8.0-fpm start
-```
-#### Bertholdt (Laravel)
-```bash
-apt-get update
-apt-get install lynx -y
-apt-get install mariadb-client -y
-apt-get install -y lsb-release ca-certificates apt-transport-https software-properties-common gnupg2
-apt-get install curl -y
-curl -sSLo /usr/share/keyrings/deb.sury.org-php.gpg https://packages.sury.org/php/apt.gpg
-sh -c 'echo "deb [signed-by=/usr/share/keyrings/deb.sury.org-php.gpg] https://packages.sury.org/php/ $(lsb_release -sc) main" > /etc/apt/sources.list.d/php.list'
-apt-get update
-apt-get install php8.0-mbstring php8.0-xml php8.0-cli   php8.0-common php8.0-intl php8.0-opcache php8.0-readline php8.0-mysql php8.0-fpm php8.0-curl unzip wget -y
-apt-get install nginx -y
-apt-get install git -y
-apt-get install htop -y
-service nginx start
-service php8.0-fpm start
-```
-#### Reiner (Laravel)
-```bash
-apt-get update
-apt-get install lynx -y
-apt-get install mariadb-client -y
-apt-get install -y lsb-release ca-certificates apt-transport-https software-properties-common gnupg2
-apt-get install curl -y
-curl -sSLo /usr/share/keyrings/deb.sury.org-php.gpg https://packages.sury.org/php/apt.gpg
-sh -c 'echo "deb [signed-by=/usr/share/keyrings/deb.sury.org-php.gpg] https://packages.sury.org/php/ $(lsb_release -sc) main" > /etc/apt/sources.list.d/php.list'
-apt-get update
-apt-get install php8.0-mbstring php8.0-xml php8.0-cli   php8.0-common php8.0-intl php8.0-opcache php8.0-readline php8.0-mysql php8.0-fpm php8.0-curl unzip wget -y
-apt-get install nginx -y
-apt-get install git -y
-apt-get install htop -y
-service nginx start
-service php8.0-fpm start
-```
-#### Zeke (Client)
-```bash
-apt update
-apt install lynx -y
-apt install htop -y
-apt install apache2-utils -y
-apt-get install jq -y
-```
-#### Erwin (Client)
-```bash
-apt update
-apt install lynx -y
-apt install htop -y
-apt install apache2-utils -y
-apt-get install jq -y
-```
-
-## Soal2
+## Soal 2-5
 Jauh sebelum perang dimulai, ternyata para keluarga bangsawan, Tybur dan Fritz, telah membuat kesepakatan sebagai berikut:
-Semua Client harus menggunakan konfigurasi ip address dari keluarga Tybur (dhcp).
-Client yang melalui bangsa marley mendapatkan range IP dari [prefix IP].1.05 - [prefix IP].1.25 dan [prefix IP].1.50 - [prefix IP].1.100 (2)
+1. Semua Client harus menggunakan konfigurasi ip address dari keluarga Tybur (dhcp).
+2. Client yang melalui bangsa marley mendapatkan range IP dari [prefix IP].1.05 - [prefix IP].1.25 dan [prefix IP].1.50 - [prefix IP].1.100 (2)
+3. Client yang melalui bangsa eldia mendapatkan range IP dari [prefix IP].2.09 - [prefix IP].2.27 dan [prefix IP].2 .81 - [prefix IP].2.243 (3)
+4. Client mendapatkan DNS dari keluarga Fritz dan dapat terhubung dengan internet melalui DNS tersebut (4)
+5. Dikarenakan keluarga Tybur tidak menyukai kaum eldia, maka mereka hanya meminjamkan ip address ke kaum eldia selama 6 menit. Namun untuk kaum marley, keluarga Tybur meminjamkan ip address selama 30 menit. Waktu maksimal dialokasikan untuk peminjaman alamat IP selama 87 menit. (5)
 
-Kita membuat soal2.sh. Setelah itu kita masukkan dan kita jalankan code berikut:
-```bash
+##### Paradise
+```
+service isc-dhcp-relay start 
+
+echo '
+SERVERS="192.238.4.3"
+INTERFACES="eth1 eth2 eth3 eth4"
+OPTIONS=""' > /etc/default/isc-dhcp-relay
+
+echo net.ipv4.ip_forward=1 > /etc/sysctl.conf
+
+service isc-dhcp-relay restart 
+```
+
+##### Tybur
+```
+   echo 'nameserver 192.238.4.2' >> /etc/resolv.conf   # Pastikan DNS Server sudah berjalan 
+
+echo 'INTERFACESv4="eth0"' > /etc/default/isc-dhcp-server
+
 echo 'subnet 192.238.1.0 netmask 255.255.255.0 {
+
+    # Soal ke-2
     range 192.238.1.05 192.238.1.25;
     range 192.238.1.50 192.238.1.100;
     option routers 192.238.1.1;
+
+    # Soal ke-4
+    option broadcast-address 192.238.1.255;
+    option domain-name-servers 192.238.4.2;
+    
+    # Soal ke-5
+    default-lease-time 1800;
+    max-lease-time 5220;
 }
+
 subnet 192.238.2.0 netmask 255.255.255.0 {
-    # Configuration for subnet 192.238.2.0
+
+    # Soal ke-3
+    range 192.238.2.09 192.238.2.27;
+    range 192.238.2.81 192.238.2.243;
+    option routers 192.238.2.1;
+
+    # Soal ke-4
+    option broadcast-address 192.238.2.255;
+    option domain-name-servers 192.238.4.2;
+
+    # Soal ke-5
+    default-lease-time 360;
+    max-lease-time 5220;
 }
 
 subnet 192.238.3.0 netmask 255.255.255.0 {
-    # Configuration for subnet 192.238.3.0
+
 }
+
 subnet 192.238.4.0 netmask 255.255.255.0 {
-    # Configuration for subnet 192.238.4.0
+
 }' > /etc/dhcp/dhcpd.conf
-# Restart DHCP service
+
 service isc-dhcp-server restart
 ```
-untuk di tybur
-```bash
-    range 192.238.1.05 192.238.1.25;
-    range 192.238.1.50 192.238.1.100;
-    option routers 192.238.1.1;
+Soal No. 4 dilakukan setup juga di Fritz
 ```
-Kita jalankan di fritz
-## Soal 3
-Client yang melalui bangsa eldia mendapatkan range IP dari [prefix IP].2.09 - [prefix IP].2.27 dan [prefix IP].2 .81 - [prefix IP].2.243 (3)
-Sama seperti diatas, jalankan code berikut:
-untuk di tybur
-```bash
-    range 192.238.2.09 192.238.2.27;
-    range 192.238.2.81 192.238.2.243;
-    option routers 192.238.2.1;
-```
-untuk di Fritz
-```bash
-echo 'subnet 192.238.1.0 netmask 255.255.255.0 {
-    range 192.238.1.05 192.238.1.25;
-    range 192.238.1.50 192.238.1.100;
-    option routers 192.238.1.1;
-}
-subnet 192.238.2.1 netmask 255.255.255.0 {
-    range 192.238.2.09 192.238.2.27;
-    range 192.238.2.81 192.238.2.243;
-    option routers 192.238.2.1;
-}
-subnet 192.238.3.0 netmask 255.255.255.0 {
-}
-subnet 192.238.4.0 netmask 255.255.255.0 {
-}' > /etc/dhcp/dhcpd.conf
-service isc-dhcp-server start
-```
-## Soal 4
-Client mendapatkan DNS dari keluarga Fritz dan dapat terhubung dengan internet melalui DNS tersebut (4)
+echo 'options {
+        directory "/var/cache/bind";
 
-Jalankan code berikut, agar dapat tehubung ke internet dengan DNS itu
-```bash
-echo 'subnet 192.238.1.0 netmask 255.255.255.0 {
-    range 192.238.1.05 192.238.1.25;
-    range 192.238.1.50 192.238.1.100;
-    option routers 192.238.1.1;
-    option broadcast-address 192.238.1.255;
-    option domain-name-servers 192.238.3.2;
-}
-subnet 192.238.2.1 netmask 255.255.255.0 {
-    range 192.238.2.09 192.238.2.27;
-    range 192.238.2.81 192.238.2.238;
-    option routers 192.238.2.1;
-    option broadcast-address 192.238.1.255;
-    option domain-name-servers 192.238.3.2;
-}
-subnet 192.238.3.0 netmask 255.255.255.0 {
-}
-subnet 192.238.4.0 netmask 255.255.255.0 {
-}' > /etc/dhcp/dhcpd.conf
-service isc-dhcp-server start
-```
-## Soal 5
-Dikarenakan keluarga Tybur tidak menyukai kaum eldia, maka mereka hanya meminjamkan ip address ke kaum eldia selama 6 menit. Namun untuk kaum marley, keluarga Tybur meminjamkan ip address selama 30 menit. Waktu maksimal dialokasikan untuk peminjaman alamat IP selama 87 menit. (5)
+        forwarders {
+                192.168.122.1;
+         };
 
-Sama Seperti soal no. 1 dan 2, jalankan di ```FRITZ```, berikut codenya :
-```bash
-echo 'subnet 192.238.1.0 netmask 255.255.255.0 {
-range 192.238.1.05 192.238.1.25;
-range 192.238.1.50 192.238.1.100;
-option routers 192.238.1.1;
-option broadcast-address 192.238.1.255;
-option domain-name-servers 192.238.3.2;
-default-lease-time 1800;
-max-lease-time 5220;
-}
-subnet 192.238.2.1 netmask 255.255.255.0 {
-range 192.238.2.09 192.238.2.27;
-range 192.238.2.81 192.238.2.238;
-option routers 192.238.2.1;
-option broadcast-address 192.238.1.255;
-option domain-name-servers 192.238.3.2;
-default-lease-time 360;
-max-lease-time 5220;
-}
-subnet 192.238.3.0 netmask 255.255.255.0 {
-}
-subnet 192.238.4.0 netmask 255.255.255.0 {
-}' > /etc/dhcp/dhcpd.conf
-service isc-dhcp-server start
+        dnssec-validation no;
+        allow-query{any;};
+        auth-nxdomain no;
+        listen-on-v6 { any; };
+}; ' >/etc/bind/named.conf.options
 ```
+Output 
+![Screenshot 2024-10-30 165157](https://github.com/user-attachments/assets/bae58683-fd23-4492-81e2-9f1bea027c7f)
+![Screenshot 2024-10-30 165146](https://github.com/user-attachments/assets/4c6c5361-2450-45d4-91a0-a1bcaae1b2ce)
+![Screenshot 2024-10-30 165138](https://github.com/user-attachments/assets/0e210ad5-fceb-4e1e-82bb-647356a874fb)
+![Screenshot 2024-10-30 165120](https://github.com/user-attachments/assets/a1dbc0bf-2400-4833-8fe5-9cd6ca2b4d18)
+![Screenshot 2024-10-30 165206](https://github.com/user-attachments/assets/dd225e40-c4e9-407a-8836-cf51cfdbb7d6)
+
+
 ## Soal 6
 Seiring berjalannya waktu kondisi semakin memanas, untuk bersiap perang. Kaum Eldia melakukan deployment sebagai berikut
 | Image |
