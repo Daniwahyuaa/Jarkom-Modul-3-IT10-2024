@@ -420,80 +420,35 @@ Analisis (8)
 
 Cara testing load balancer yaitu dengan cara memasukkan code sebagai berikut
 ```bash
-echo 'upstream round_robin  {
-    server 192.238.2.2 ; #IP Armin
-    server 192.238.2.3 ; #IP Eren
-    server 192.238.2.4 ; #IP Mikasa
-}
-server {
-    listen 8080;
-    location / {
-    proxy_pass http://round_robin;
-    proxy_set_header    X-Real-IP $remote_addr;
-    proxy_set_header    X-Forwarded-For $proxy_add_x_forwarded_for;
-    proxy_set_header    Host $http_host;
-    }
-    error_log /var/log/nginx/lb_error.log;
-    access_log /var/log/nginx/lb_access.log;
-}' >/etc/nginx/sites-available/round-robin
-echo 'upstream generic_hash  {
-    hash $request_uri consistent;
-    server 192.238.2.2 ; #IP Armin
-    server 192.238.2.3 ; #IP Eren
-    server 192.238.2.4 ; #IP Mikasa
-}
+# Soal 8: Jalankan pada Colossal dan coba menggunakan tiap algoritma load balancing
+echo '
+ upstream myweb  {
+#    hash $request_uri consistent;
+#    least_conn;
+#    ip_hash;
+        server 192.238.2.2; #IP Armin
+        server 192.238.2.3; #IP Eren
+        server 192.238.2.4; #IP Mikasa
+ }
 
-server {
-    listen 8081;
-    location / {
-    proxy_pass http://generic_hash;
-    proxy_set_header    X-Real-IP $remote_addr;
-    proxy_set_header    X-Forwarded-For $proxy_add_x_forwarded_for;
-    proxy_set_header    Host $http_host;
-    }
-    error_log /var/log/nginx/lb_error.log;
-    access_log /var/log/nginx/lb_access.log;
-}' >/etc/nginx/sites-available/generic-hash
-echo 'upstream ip_hash  {
-    ip_hash;
-    server 192.238.2.2 ; #IP Armin
-    server 192.238.2.3 ; #IP Eren
-    server 192.238.2.4 ; #IP Mikasa
-}
-server {
-    listen 8082;
-    location / {
-    proxy_pass http://ip_hash;
-    proxy_set_header    X-Real-IP $remote_addr;
-    proxy_set_header    X-Forwarded-For $proxy_add_x_forwarded_for;
-    proxy_set_header    Host $http_host;
-    }
-    error_log /var/log/nginx/lb_error.log;
-    access_log /var/log/nginx/lb_access.log;
-}' >/etc/nginx/sites-available/ip-hash
-echo 'upstream least_conn  {
-    least_conn;
-    server 192.238.2.2 ; #IP Armin
-    server 192.238.2.3 ; #IP Eren
-    server 192.238.2.4 ; #IP Mikasa
-}
-server {
-    listen 8083;  
-    location / {
-    proxy_pass http://least_conn;
-    proxy_set_header    X-Real-IP $remote_addr;
-    proxy_set_header    X-Forwarded-For $proxy_add_x_forwarded_for;
-    proxy_set_header    Host $http_host;
-    }
-    error_log /var/log/nginx/lb_error.log;
-    access_log /var/log/nginx/lb_access.log;
-}' >/etc/nginx/sites-available/least-conn
-unlink /etc/nginx/sites-enabled/default
-ln -s /etc/nginx/sites-available/round-robin /etc/nginx/sites-enabled/round-robin
-ln -s /etc/nginx/sites-available/generic-hash /etc/nginx/sites-enabled/generic-hash
-ln -s /etc/nginx/sites-available/ip-hash /etc/nginx/sites-enabled/ip-hash
-ln -s /etc/nginx/sites-available/least-conn /etc/nginx/sites-enabled/least-conn
+ server {
+        listen 80;
+        server_name eldia.it10.com;
+
+        location / {
+        proxy_pass http://myweb;
+        }
+ }' > /etc/nginx/sites-available/lb-php
+
+ln -s /etc/nginx/sites-available/lb-php /etc/nginx/sites-enabled
+rm -rf /etc/nginx/sites-enabled/default
+
 service nginx restart
+nginx -t
+```
+lakukan ini pada erwin saat algo Load Balancer diubah
+```
+ab -n 1000 -c 75 http://eldia.it10.com/
 ```
 tidak lupa membuat laporan dengan cara memasukkan code sebagai berikut:
 ```bash
@@ -757,176 +712,4 @@ fi
 ```
 setelah ini kita akan mendapatkan semua laporan.
 
-## Soal 9
-Dengan menggunakan algoritma Least-Connection, lakukan testing dengan menggunakan 3 worker, 2 worker, dan 1 worker sebanyak 1000 request dengan 10 request/second, kemudian tambahkan grafiknya pada “laporan kerja Armin”. (9)
 
-kita buat file sh nya terlebih dahulu
-```bash
-echo 'upstream least_conn_2_worker  {
-    least_conn;
-    server 192.238.2.2 ; #IP Armin
-    server 192.238.2.3 ; #IP Eren
-}
-server {
-    listen 8084;
-        location / {
-            proxy_pass http://least_conn_2_worker;
-            proxy_set_header    X-Real-IP $remote_addr;
-            proxy_set_header    X-Forwarded-For $proxy_add_x_forwarded_for;
-            proxy_set_header    Host $http_host;
-        }
-    error_log /var/log/nginx/lb_error.log;
-    access_log /var/log/nginx/lb_access.log;
-}' >/etc/nginx/sites-available/least-conn-2-worker
-echo 'upstream least_conn_1_worker  {
-    least_conn;
-    server 192.238.2.2 ; #IP Armin
-}
-server {
-    listen 8085;
-        location / {
-            proxy_pass http://least_conn_1_worker;
-            proxy_set_header    X-Real-IP $remote_addr;
-            proxy_set_header    X-Forwarded-For $proxy_add_x_forwarded_for;
-            proxy_set_header    Host $http_host;
-        }
-    error_log /var/log/nginx/lb_error.log;
-    access_log /var/log/nginx/lb_access.log;
-}' >/etc/nginx/sites-available/least-conn-1-worker
-ln -s /etc/nginx/sites-available/least-conn-2-worker /etc/nginx/sites-enabled/least-conn-2-worker
-ln -s /etc/nginx/sites-available/least-conn-1-worker /etc/nginx/sites-enabled/least-conn-1-worker
-service nginx restart
-```
-## Soal 10
-Selanjutnya coba tambahkan keamanan dengan konfigurasi autentikasi di Colossal dengan dengan kombinasi username: “arminannie” dan password: “jrkmyyy”, dengan yyy merupakan kode kelompok. Terakhir simpan file “htpasswd” nya di /etc/nginx/supersecret/ (10)
-
-Kita tambahkan keamanan dengan menjalankan code berikut:
-```bash
-mkdir /etc/nginx/supersecret/
-htpasswd -bc /etc/nginx/supersecret/htpasswd arminannie jrkmit10
-echo 'upstream round_robin  {
-    server 192.238.2.2 ; #IP Armin
-    server 192.238.2.3 ; #IP Eren
-    server 192.238.2.4 ; #IP Mikasa
-}
-server {
-    listen 8080;
-        location / {
-            auth_basic "Restricted Content";
-            auth_basic_user_file /etc/nginx/supersecret/htpasswd;
-            proxy_pass http://round_robin;
-            proxy_set_header    X-Real-IP $remote_addr;
-            proxy_set_header    X-Forwarded-For $proxy_add_x_forwarded_for;
-            proxy_set_header    Host $http_host;
-        }
-    error_log /var/log/nginx/lb_error.log;
-    access_log /var/log/nginx/lb_access.log;
-}' >/etc/nginx/sites-available/round-robin
-ln -s /etc/nginx/sites-available/round-robin /etc/nginx/sites-enabled/round-robin
-service nginx restart
-```
-## Soal 11
-Lalu buat untuk setiap request yang mengandung /titan akan di proxy passing menuju halaman https://attackontitan.fandom.com/wiki/Attack_on_Titan_Wiki (11) 
-hint: (proxy_pass)
-
-Code dibawah dapat kita jalankan
-```bash
-#Pada Colossal
-echo '
- upstream myweb  {
-        least_conn;
-        server 192.238.2.2; #IP Armin
-        server 192.238.2.3; #IP Eren
-        server 192.238.2.4; #IP Mikasa
- }
- server {
-        listen 80;
-        server_name eldia.10.com;
-        location / {
-        auth_basic "Restricted Access";
-        auth_basic_user_file /etc/nginx/supersecret/htpasswd;
-        proxy_pass http://myweb;
-        }
-        location /titan/ {
-        proxy_pass https://attackontitan.fandom.com/wiki/Attack_on_Titan_Wiki/;
-        }
- }' > /etc/nginx/sites-available/lb-php
-ln -s /etc/nginx/sites-available/lb-php /etc/nginx/sites-enabled
-rm -rf /etc/nginx/sites-enabled/default
-service nginx restart
-nginx -t
-```
-## Soal 12
-Selanjutnya Colossal ini hanya boleh diakses oleh client dengan IP [Prefix IP].1.77, [Prefix IP].1.88, [Prefix IP].2.144, dan [Prefix IP].2.156. (12) 
-hint: (fixed in dulu clientnya)
-
-Kita masukkan 3 code yang masing" ada di Tybur, Zeke, Dan Colossal
-##### code untuk tybur
-```bash
-echo 'host Zeke{
-        hardware ethernet fa:61:fb:1a:8d:5b;
-        fixed-address 192.238.1.77;
-		}
-' >> /etc/dhcp/dhcpd.conf
-service isc-dhcp-server restart
-```
-##### code untuk Zeke
-```bash
-echo 'hwaddress ether fa:61:fb:1a:8d:5b' >> /etc/network/interfaces
-```
-##### code untuk colossal
-```bash
-echo '
- upstream myweb  {
-        least_conn;
-        server 192.238.2.2; #IP Armin
-        server 192.238.2.3; #IP Eren
-        server 192.238.2.4; #IP Mikasa
-		 }
-
-server {
-	listen 80;
-	server_name eldia.10.com;
-
-	location / {
-		allow 192.238.1.77;
-		allow 192.238.1.88;
-		allow 192.238.2.144;
-		allow 192.238.2.156;
-		deny all;
-
-		auth_basic "Restricted Content";
-		auth_basic_user_file /etc/nginx/supersecret/htpasswd;
-		proxy_pass http://myweb;
-	}
-
-	location /dune {
-		proxy_pass https://attackontitan.fandom.com/wiki/Attack_on_Titan_Wiki/;
-	}
-}' > /etc/nginx/sites-available/lb-php
-
-ln -s /etc/nginx/sites-available/lb-php /etc/nginx/sites-enabled
-rm -rf /etc/nginx/sites-enabled/default
-
-service nginx restart
-nginx -t
-```
-## Soal 13
-Melihat perlawanan yang sengit dari kaum eldia, kaum marley pun memutar otak dan mengatur para worker di marley. 
-Karena mengetahui bahwa ada keturunan marley yang mewarisi kekuatan titan, Zeke pun berinisiatif untuk menyimpan data data penting di Warhammer, dan semua data tersebut harus dapat diakses oleh anak buah kesayangannya, Annie, Reiner, dan Berthold.  (13)
-
-kita bisa memasukkan code dibawah
-```bash
-mysql -u root -p
-CREATE USER 'kelompokit10'@'%' IDENTIFIED BY 'passwordit10';
-CREATE USER 'kelompokit10'@'localhost' IDENTIFIED BY 'passwordit10';
-CREATE DATABASE dbkelompokit10;
-GRANT ALL PRIVILEGES ON *.* TO 'kelompokit10'@'%';
-GRANT ALL PRIVILEGES ON *.* TO 'kelompokit10'@'localhost';
-FLUSH PRIVILEGES;
-exit
-```
-akses semua laravel dengan menggunakan
-```bash
-mariadb --host=192.238.3.4 --port=3306 --user=kelompokit10 --password
-```
