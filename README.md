@@ -419,8 +419,9 @@ Grafik request per second untuk masing masing algoritma.
 Analisis (8)
 
 Cara testing load balancer yaitu dengan cara memasukkan code sebagai berikut
+Jalankan pada Colossal dan coba menggunakan tiap algoritma load balancing
 ```bash
-# Soal 8: Jalankan pada Colossal dan coba menggunakan tiap algoritma load balancing
+
 echo '
  upstream myweb  {
 #    hash $request_uri consistent;
