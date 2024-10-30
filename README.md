@@ -166,9 +166,6 @@ echo 'options {
         listen-on-v6 { any; };
 }; ' >/etc/bind/named.conf.options
 
-service bind9 restart
-```
-```
 echo "zone \"marley.IT10.com\" {
 	type master;
 	file \"/etc/bind/jarkom/marley.IT10.com\";
