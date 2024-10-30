@@ -137,7 +137,7 @@ apt install isc-dhcp-relay -y
 #### Tybur
 ```
 apt-get update
-apt install isc-dhcp-relay -y
+apt-get install isc-dhcp-server -y
 ```
 
 #### Fritz
