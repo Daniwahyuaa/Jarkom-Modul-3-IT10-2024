@@ -301,60 +301,56 @@ Armin berinisiasi untuk memerintahkan setiap worker PHP untuk melakukan konfigur
 
 jadi berikut adalah code untuk PHP:
 ```bash
-echo 'nameserver 192.238.4.2' > /etc/resolv.conf
+echo 'nameserver 192.238.4.2' > /etc/resolv.conf # IP DNS-SERVER
+
 apt-get update
+
 apt-get install nginx -y
+apt-get install lynx -y
+apt-get install php7.3 php7.3-fpm php7.3-mysql -y   # Install PHP 7.3 dan modul yang diperlukan
 apt-get install wget -y
 apt-get install unzip -y
-apt-get install lynx -y
-apt-get install htop -y
-apt-get install apache2-utils -y
-apt-get install php7.3-fpm php7.3-common php7.3-mysql php7.3-gmp php7.3-curl php7.3-intl php7.3-mbstring php7.3-xmlrpc php7.3-gd php7.3-xml php7.3-cli php7.3-zip -y
+apt-get install rsync -y    # Install rsync untuk transfer file
 
 service nginx start
-service php7.3-fpm start
+service php7.3-fpm start    # Jalankan PHP-FPM versi 7.3
 
-mkdir -p /var/www/eldia.it10.com
+wget --no-check-certificate 'https://drive.google.com/uc?export=download&id=1ufulgiWyTbOXQcow11JkXG7safgLq1y-' -O '/var/www/modul-3.zip'
 
-wget --no-check-certificate 'https://drive.google.com/drive/folders/1MHVQDEjHbOw1HkdhjwHwzjX9KNA8AgVn?usp=sharing' -O /root/bangsaEldia.zip
-unzip /root/bangsaEldia.zip -d /var/www/eldia.it10.com
-rm -rf /root/bangsaEldia.zip
+unzip -o /var/www/modul-3.zip -d /var/www/
+rm /var/www/modul-3.zip
 
-echo '
-server {
+rsync -av /var/www/modul-3/ /var/www/eldia.it10.com/
 
-        listen 80;
+rm -r /var/www/modul-3
 
-        root /var/www/eldia.it10.com;
+cp /etc/nginx/sites-available/default /etc/nginx/sites-available/eldia.it10.com
 
-        index index.php index.html index.htm;
-        servername ;
+ln -s /etc/nginx/sites-available/eldia.it10.com /etc/nginx/sites-enabled/
 
-        location / {
-                        try_files $uri $uri/ /index.php?$query_string;
-        }
+rm /etc/nginx/sites-enabled/default
 
-        # pass PHP scripts to FastCGI server
-        location ~ .php$ {
+echo 'server {
+    listen 80;
+    server_name _;
+
+    root /var/www/eldia.it10.com;
+    index index.php index.html index.htm;
+
+    location / {
+        try_files $uri $uri/ /index.php?$query_string;
+    }
+
+    location ~ \.php$ {
         include snippets/fastcgi-php.conf;
-        fastcgi_pass unix:/var/run/php/php7.3-fpm.sock;
-        }
+        fastcgi_pass unix:/run/php/php7.3-fpm.sock;  # Sesuaikan versi PHP dan socket
+        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+        include fastcgi_params;
+    }
+}' > /etc/nginx/sites-available/eldia.it10.com
 
-location ~ /.ht {
-                        deny all;
-        }
-
-        error_log /var/log/nginx/jarkom_error.log;
-        access_log /var/log/nginx/jarkom_access.log;
- }' > /etc/nginx/sites-available/eldia.it10.com
-
-ln -s /etc/nginx/sites-available/eldia.it10.com /etc/nginx/sites-enabled
-rm -rf /etc/nginx/sites-enabled/default
-
-service php7.3-fpm start
-service php7.3-fpm restart
 service nginx restart
-nginx -t
+service php7.3-fpm restart
 ```
 Output Hasil Code diatas
 ![Screenshot 2024-10-30 165053](https://github.com/user-attachments/assets/7a006873-5c7c-4686-9b73-7152f805fcae)
@@ -364,44 +360,51 @@ Dikarenakan Armin sudah mendapatkan kekuatan titan colossal, maka bantulah kaum 
 
 ##### soal7col.sh
 ```bash
-echo '
-upstream myweb  {
-server 192.238.2.2; #IP Armin
-server 192.238.2.3; #IP Eren
-server 192.238.2.1; #IP Mikasa
- }
- server {
-listen 80;
-server_name eldia.10.com;
-location / {
-proxy_pass http://myweb; }
-}' > /etc/nginx/sites-available/lb-php
-ln -s /etc/nginx/sites-available/lb-php /etc/nginx/sites-enabled
-rm -rf /etc/nginx/sites-enabled/default
+echo 'nameserver 192.238.4.2' > /etc/resolv.conf
+
+apt-get update
+
+apt-get install apache2-utils -y   # Untuk testing menggunakan ApacheBench (ab)
+apt-get install nginx -y           # Install Nginx sebagai load balancer
+apt-get install lynx -y            # Install lynx untuk akses web via command line
+
+cp /etc/nginx/sites-available/default /etc/nginx/sites-available/colossal_lb
+
+echo "upstream php_backend {
+    server 192.238.2.2;  # Armin
+    server 192.238.2.3;  # Eren
+    server 192.238.2.4;  # Mikasa
+}
+
+server {
+    listen 80;
+    root /var/www/html;
+    index index.html index.htm index.nginx-debian.html;
+    server_name eldia.it10.com;
+
+    location / {
+        proxy_pass http://php_backend;
+        proxy_set_header Host \$host;
+        proxy_set_header X-Real-IP \$remote_addr;
+        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto \$scheme;
+    }
+}" > /etc/nginx/sites-enabled/colossal_lb
+
+ln -sf /etc/nginx/sites-available/colossal_lb /etc/nginx/sites-enabled/
+
+rm -r /etc/nginx/sites-enabled/default
+
 service nginx restart
-nginx -t
 ```
-##### soal7fritz.sh
-```bash
-echo ';
-; BIND data file for local loopback interface
-;
-$TTL    604800
-@       IN      SOA     eldia.it10.com. root.eldia.it10.com. (
-                              2         ; Serial
-                         604800         ; Refresh
-                          86400         ; Retry
-                        2419200         ; Expire
-                         604800 )       ; Negative Cache TTL
-;
-@       IN      NS      eldia.it10.com.
-@       IN      A       192.238.3.3     ; IP Colossal' > /etc/bind/eldia/eldia.it10.com
-service bind9 restart
+ubah IP yang dituju pada Fritz
+![Ganti IP](https://github.com/user-attachments/assets/7706e9be-97bd-4391-a630-6c2de0caf2f1)
+setelah itu lakukanlah testing
 ```
-kemudian dilakukan testing dengan cara memasukkan 
-```bash
 ab -n 6000 -c 200 http://eldia.it10.com/
 ```
+Output
+![SS no 7](https://github.com/user-attachments/assets/c4176cd0-2b33-4b47-acf9-b667345819b1)
 
 ## Soal 8
 Karena Erwin meminta “laporan kerja Armin”, maka dari itu buatlah analisis hasil testing dengan 1000 request dan 75 request/second untuk masing-masing algoritma Load Balancer dengan ketentuan sebagai berikut:
