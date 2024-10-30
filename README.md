@@ -128,6 +128,24 @@ iface eth0 inet static
 ##### PREFIX PAKAI 192.238
 ### Setup Node
 
+#### Paradis
+```
+apt-get update
+apt install isc-dhcp-relay -y
+```
+
+#### Tybur
+```
+apt-get update
+apt install isc-dhcp-relay -y
+```
+
+#### Fritz
+```
+apt-get update
+apt-get install bind9 -y
+```
+
 ## Soal 0
 Pulau Paradis telah menjadi tempat yang damai selama 1000 tahun, namun kedamaian tersebut tidak bertahan selamanya. Perang antara kaum Marley dan Eldia telah mencapai puncak. Kaum Marley yang dipimpin oleh Zeke, me-register domain name marley.yyy.com untuk worker Laravel mengarah pada Annie. Namun ternyata tidak hanya kaum Marley saja yang berinisiasi, kaum Eldia ternyata sudah mendaftarkan domain name eldia.yyy.com untuk worker PHP (0) mengarah pada Armin.
 
@@ -270,7 +288,7 @@ echo 'options {
         listen-on-v6 { any; };
 }; ' >/etc/bind/named.conf.options
 ```
-Output 
+Output dari hasil diatas
 ![Screenshot 2024-10-30 165157](https://github.com/user-attachments/assets/bae58683-fd23-4492-81e2-9f1bea027c7f)
 ![Screenshot 2024-10-30 165146](https://github.com/user-attachments/assets/4c6c5361-2450-45d4-91a0-a1bcaae1b2ce)
 ![Screenshot 2024-10-30 165138](https://github.com/user-attachments/assets/0e210ad5-fceb-4e1e-82bb-647356a874fb)
@@ -279,11 +297,6 @@ Output
 
 
 ## Soal 6
-Seiring berjalannya waktu kondisi semakin memanas, untuk bersiap perang. Kaum Eldia melakukan deployment sebagai berikut
-| Image |
-|----|
-|danielcristh0/debian-buster:1.1 atau derkora/ubuntu-jarkom-it:1.0  | 
-
 Armin berinisiasi untuk memerintahkan setiap worker PHP untuk melakukan konfigurasi virtual host untuk website berikut https://intip.in/BangsaEldia dengan menggunakan php 7.3 (6)
 
 jadi berikut adalah code untuk PHP:
@@ -343,7 +356,8 @@ service php7.3-fpm restart
 service nginx restart
 nginx -t
 ```
-Jadi diatas adalah code untuk PHP.
+Output Hasil Code diatas
+![Screenshot 2024-10-30 165053](https://github.com/user-attachments/assets/7a006873-5c7c-4686-9b73-7152f805fcae)
 
 ## Soal 7
 Dikarenakan Armin sudah mendapatkan kekuatan titan colossal, maka bantulah kaum eldia menggunakan colossal agar dapat bekerja sama dengan baik. Kemudian lakukan testing dengan 6000 request dan 200 request/second. (7)
